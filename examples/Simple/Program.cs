@@ -9,8 +9,8 @@ namespace Simple
     {
         public static async Task Main()
         {
-            //Console.WriteLine("Press any key to apply updates");
-            //var key = Console.ReadKey();
+            Console.WriteLine("Press any key to apply updates");
+            var key = Console.ReadKey();
 
             try
             {
@@ -19,7 +19,23 @@ namespace Simple
                 {
                     c.AddConsole();
                 });
-                services.AddEndogenousUpdater("..\\..\\..\\..\\update-source");
+
+                const string destinationDirectory = @"C:\ProgramData\Company\Simple";
+                if (string.Equals(destinationDirectory, Environment.CurrentDirectory))
+                {
+                    services.AddEndogenousUpdater(@"F:\Source\Repos\EndogenousUpdater\examples\Simple\update-source");
+                }
+                else
+                {
+                    // "installer" option
+                    services.AddEndogenousUpdater(u =>
+                    {
+                        u.ZipFileSource(@"F:\Source\Repos\EndogenousUpdater\examples\Simple\update-source\simple-1.0.0.0.zip");
+                        u.DirectoryDestination(destinationDirectory);
+                        u.AlwaysUpdate();
+                        u.WithRelaunchOptions(o => o.InferLaunchOptions(destinationDirectory));
+                    });
+                }
 
                 var serviceProvider = services.BuildServiceProvider();
                 var updater = serviceProvider.GetRequiredService<IEndogenousUpdater>();

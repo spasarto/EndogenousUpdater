@@ -30,6 +30,8 @@ namespace EndogenousUpdater.Cleaners
         public Task CleanupOldFilesAsync(CancellationToken cancellationToken)
         {
             var destinationDirectory = new DirectoryInfo(directoryPath);
+            if(!destinationDirectory.Exists)
+                destinationDirectory.Create();
 
             TryWaitForOldProcess();
 

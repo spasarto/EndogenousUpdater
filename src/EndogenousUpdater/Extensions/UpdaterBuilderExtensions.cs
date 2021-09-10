@@ -1,9 +1,11 @@
 ﻿using EndogenousUpdater.Configurations;
 using EndogenousUpdater.UpdateDestinations;
+using EndogenousUpdater.Updaters;
 using EndogenousUpdater.UpdateSources;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -21,6 +23,12 @@ namespace EndogenousUpdater
             vBuilder.ApplyWhenNewerVersion();
             configure(vBuilder);
 
+            return builder;
+        }
+
+        public static IUpdaterBuilder AlwaysUpdate(this IUpdaterBuilder builder)
+        {
+            builder.Services.AddTransient<IUpdateChecker, AlwaysUpdater>();
             return builder;
         }
 
@@ -70,6 +78,12 @@ namespace EndogenousUpdater
             return builder;
         }
 
+        public static IUpdaterBuilder DirectoryDestination(this IUpdaterBuilder builder, string directory)
+        {
+            builder.Services.AddSingleton<IUpdateDestination, DirectoryUpdateDestination>(sp => new DirectoryUpdateDestination(directory));
+            return builder;
+        }
+
         /// <summary>
         /// Configures the updater to relaunch the application after updates have been applied.
         /// </summary>
@@ -82,7 +96,7 @@ namespace EndogenousUpdater
         /// <summary>
         /// Attempts to infer the launch options based on how the current executing version was launched.
         /// </summary>
-        public static ApplicationRestartOptions InferLaunchOptions(this ApplicationRestartOptions options)
+        public static ApplicationRestartOptions InferLaunchOptions(this ApplicationRestartOptions options, string directory = null)
         {
             var exe = Environment.GetCommandLineArgs()[0];
             string args;
@@ -100,7 +114,17 @@ namespace EndogenousUpdater
 #endif
                 args = string.Join(" ", Environment.GetCommandLineArgs().Skip(1));
             }
+
+            if (directory != null)
+            {
+                var file = Path.GetFileName(exe);
+                exe = Path.Combine(directory, file);
+            }
+
             options.ProcessToRelaunchArguments = new ProcessStartInfo(exe, args);
+
+            if(directory != null)
+                options.ProcessToRelaunchArguments.WorkingDirectory = directory;
 
             return options;
         }

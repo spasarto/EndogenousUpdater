@@ -1,26 +1,31 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace EndogenousUpdater.Staging
 {
-    public class ZipFileStagedUpdate : IStagedUpdate
+    public class DirectoryStagedUpdate : IStagedUpdate
     {
-        private readonly FileStream stream;
+        private readonly string stagedFolder;
         private bool disposedValue;
 
-        public ZipFileStagedUpdate(FileStream stream)
+        public DirectoryStagedUpdate(string stagedFolder, bool cleanupSourceFolder = true)
         {
-            this.stream = stream;
+            this.stagedFolder = stagedFolder;
+            disposedValue = !cleanupSourceFolder;
         }
 
         public Task CopyToDestinationAsync(string destinationPath, CancellationToken cancellationToken)
         {
-            var archive = new ZipArchive(stream);
+            var directory = new DirectoryInfo(stagedFolder);
+            var files = directory.GetFiles("*", SearchOption.AllDirectories);
 
-            archive.ExtractToDirectory(destinationPath);
+            foreach (var file in files)
+            {
+                var destFile = file.FullName.Replace(stagedFolder, destinationPath);
+                File.Move(file.FullName, destFile);
+            }
 
             return Task.CompletedTask;
         }
@@ -31,9 +36,7 @@ namespace EndogenousUpdater.Staging
             {
                 if (disposing)
                 {
-                    string filePath = stream.Name;
-                    stream.Dispose();
-                    File.Delete(filePath);
+                    Directory.Delete(stagedFolder, true);
                 }
 
                 disposedValue = true;

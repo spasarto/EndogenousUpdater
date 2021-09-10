@@ -5,16 +5,11 @@ namespace EndogenousUpdater.Configurations
     public interface IVersionBasedUpdatesBuilder
     {
         IServiceCollection Services { get; }
-        ISourceVersionBasedUpdatesBuilder Source { get; }
-        IDestinationVersionBasedUpdatesBuilder Destination { get; }
+        IVersionBasedUpdatesTargetBuilder Source { get; }
+        IVersionBasedUpdatesTargetBuilder Destination { get; }
     }
 
-    public interface ISourceVersionBasedUpdatesBuilder
-    {
-        IServiceCollection Services { get; }
-    }
-
-    public interface IDestinationVersionBasedUpdatesBuilder
+    public interface IVersionBasedUpdatesTargetBuilder
     {
         IServiceCollection Services { get; }
     }
@@ -22,8 +17,8 @@ namespace EndogenousUpdater.Configurations
     public class VersionBasedUpdatesBuilder : IVersionBasedUpdatesBuilder
     {
         public IServiceCollection Services { get; }
-        public ISourceVersionBasedUpdatesBuilder Source { get; }
-        public IDestinationVersionBasedUpdatesBuilder Destination { get; }
+        public IVersionBasedUpdatesTargetBuilder Source { get; }
+        public IVersionBasedUpdatesTargetBuilder Destination { get; }
 
         public VersionBasedUpdatesBuilder(IServiceCollection services)
         {
@@ -33,7 +28,7 @@ namespace EndogenousUpdater.Configurations
         }
     }
 
-    public class VersionBasedUpdatesTargetBuilder : ISourceVersionBasedUpdatesBuilder, IDestinationVersionBasedUpdatesBuilder
+    public class VersionBasedUpdatesTargetBuilder : IVersionBasedUpdatesTargetBuilder
     {
         public IServiceCollection Services { get; }
 
