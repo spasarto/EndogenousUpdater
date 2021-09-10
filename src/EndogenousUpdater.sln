@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndogenousUpdater", "EndogenousUpdater\EndogenousUpdater.csproj", "{F926A31D-443F-4CF5-96A0-0EDD203AF61F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F926A31D-443F-4CF5-96A0-0EDD203AF61F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F926A31D-443F-4CF5-96A0-0EDD203AF61F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F926A31D-443F-4CF5-96A0-0EDD203AF61F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F926A31D-443F-4CF5-96A0-0EDD203AF61F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {61416F1B-9090-4077-BB26-BCC4DE44DD91}
+	EndGlobalSection
+EndGlobal

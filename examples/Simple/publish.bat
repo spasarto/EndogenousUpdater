@@ -1,0 +1,1 @@
+dotnet publish --output ".\bin\Release\net6.0\win-x64" --runtime win-x64 --configuration Release -p:PublishSingleFile=true -p:PublishTrimmed=false --self-contained false
