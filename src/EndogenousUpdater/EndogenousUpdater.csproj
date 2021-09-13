@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/spasarto/EndogenousUpdater</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>6.0.0.1</Version>
+    <Version>6.0.0.2</Version>
     <Description>Performs application updates using the application itself as the updater.</Description>
   </PropertyGroup>
 

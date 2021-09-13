@@ -18,9 +18,9 @@ namespace EndogenousUpdater.UpdateSources
         public Task<IStagedUpdate> StageApplicationAsync(CancellationToken cancellationToken)
         {
             var directory = new DirectoryInfo(directoryPath);
-            var updateSource = directory.GetFiles()
+            var updateSource = directory.GetFiles("*.zip")
+                                   .OrderByDescending(v => v.FullName)
                                    .Select(f => new ZipFileUpdateSource(f.FullName))
-                                   .OrderByDescending(v => v)
                                    .FirstOrDefault();
 
             return updateSource.StageApplicationAsync(cancellationToken);
