@@ -26,8 +26,8 @@ namespace EndogenousUpdater.VersionProviders
                 throw new ArgumentException($"Directory '{directoryPath}' does not exist. Cannot infer version from it.");
 
             var version = directory.GetFiles()
+                                   .OrderByDescending(v => v.Name)
                                    .Select(f => new FilenameVersionProvider(f.Name))
-                                   .OrderByDescending(v => v)
                                    .FirstOrDefault();
 
             return version.GetVersionAsync(cancellationToken);
