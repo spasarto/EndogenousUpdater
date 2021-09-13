@@ -25,7 +25,7 @@ namespace EndogenousUpdater.VersionProviders
             if (!directory.Exists)
                 throw new ArgumentException($"Directory '{directoryPath}' does not exist. Cannot infer version from it.");
 
-            var version = directory.GetFiles()
+            var version = directory.GetFiles("*.zip")
                                    .OrderByDescending(v => v.Name)
                                    .Select(f => new FilenameVersionProvider(f.Name))
                                    .FirstOrDefault();

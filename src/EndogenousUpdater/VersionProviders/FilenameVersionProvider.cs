@@ -10,7 +10,7 @@ namespace EndogenousUpdater.VersionProviders
     {
         private readonly string fileName;
 
-        public Regex VersionRegex { get; set; } = new Regex(@"^.*?[\.-]((?:\d\.)+\d)$");
+        public Regex VersionRegex { get; set; } = new Regex(@"^.*?[\.-]((?:\d+\.)+\d+)$");
 
         public FilenameVersionProvider(string fileName)
         {

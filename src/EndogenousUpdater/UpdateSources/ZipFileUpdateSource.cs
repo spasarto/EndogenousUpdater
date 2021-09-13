@@ -14,16 +14,12 @@ namespace EndogenousUpdater.UpdateSources
             this.fileName = fileName;
         }
 
-        public async Task<IStagedUpdate> StageApplicationAsync(CancellationToken cancellationToken)
+        public Task<IStagedUpdate> StageApplicationAsync(CancellationToken cancellationToken)
         {
             var tempFile = Path.GetTempFileName();
-            var fileStream = File.Open(tempFile, FileMode.OpenOrCreate);
-            using (var sourceStream = File.Open(fileName, FileMode.Open))
-            {
-                await sourceStream.CopyToAsync(fileStream, 81920, cancellationToken);
-            }
+            File.Copy(fileName, tempFile, true);
 
-            return new ZipFileStagedUpdate(fileStream);
+            return Task.FromResult<IStagedUpdate>(new ZipFileStagedUpdate(File.OpenRead(tempFile)));
         }
     }
 }
