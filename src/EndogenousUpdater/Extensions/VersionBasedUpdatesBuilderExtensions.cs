@@ -2,7 +2,9 @@
 using EndogenousUpdater.Updaters;
 using EndogenousUpdater.VersionProviders;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
+using System.Net.Http;
 using System.Reflection;
 
 namespace EndogenousUpdater
@@ -50,6 +52,43 @@ namespace EndogenousUpdater
             if (directoryPath == null) throw new ArgumentNullException(nameof(directoryPath));
 
             builder.Services.Configure<VersionOptions>(options => options.Source = new DirectoryVersionProvider(directoryPath));
+            return builder;
+        }
+
+        /// <summary>
+        /// Determines the source (server) version from the given http endpoint. The endpoint should be a GET endpoint that returns a version number.
+        /// </summary>
+        public static IVersionBasedUpdatesTargetBuilder WithHttpVersion(this IVersionBasedUpdatesTargetBuilder builder, string uri) => WithHttpVersion(builder, uri, httpClient => { });
+
+        /// <summary>
+        /// Determines the source (server) version from the given http endpoint. The endpoint should be a GET endpoint that returns a version number.
+        /// </summary>
+        public static IVersionBasedUpdatesTargetBuilder WithHttpVersion(this IVersionBasedUpdatesTargetBuilder builder, string uri, Action<HttpClient> configureClient)
+        {
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
+
+            builder.Services.AddHttpClient<IConfigureOptions<VersionOptions>, ConfigureHttpZipVersionOptions>(httpClient =>
+            {
+                configureClient(httpClient);
+                return new ConfigureHttpZipVersionOptions(httpClient, uri);
+            });
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Determines the source (server) version from the given http endpoint. The endpoint should be a GET endpoint that returns a version number.
+        /// </summary>
+        public static IVersionBasedUpdatesTargetBuilder WithHttpVersion(this IVersionBasedUpdatesTargetBuilder builder, string uri, Action<HttpClient, IServiceProvider> configureClient)
+        {
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
+
+            builder.Services.AddHttpClient<IConfigureOptions<VersionOptions>, ConfigureHttpZipVersionOptions>((httpClient, sp) =>
+            {
+                configureClient(httpClient, sp);
+                return new ConfigureHttpZipVersionOptions(httpClient, uri);
+            });
+
             return builder;
         }
     }

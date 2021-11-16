@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 
 namespace EndogenousUpdater
@@ -57,6 +58,46 @@ namespace EndogenousUpdater
         }
 
         /// <summary>
+        /// Configures the updater to pull its update from the given uri. The content of the GET request should return a zip stream.
+        /// You need to configure how the updater determines updates using the other extension methods.
+        /// </summary>
+        public static IUpdaterBuilder HttpZipContentSource(this IUpdaterBuilder builder, string uri) => HttpZipContentSource(builder, uri, httpClient => { });
+
+        /// <summary>
+        /// Configures the updater to pull its update from the given uri. The content of the GET request should return a zip stream.
+        /// You need to configure how the updater determines updates using the other extension methods.
+        /// </summary>
+        public static IUpdaterBuilder HttpZipContentSource(this IUpdaterBuilder builder, string uri, Action<HttpClient> configureClient)
+        {
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
+
+            configureClient = configureClient ?? new Action<HttpClient>(client => { });
+            builder.Services.AddHttpClient<IUpdateSource, HttpZipContentSource>(httpClient =>
+            {
+                configureClient(httpClient);
+                return new HttpZipContentSource(httpClient, uri);
+            });
+            return builder;
+        }
+
+        /// <summary>
+        /// Configures the updater to pull its update from the given uri. The content of the GET request should return a zip stream.
+        /// You need to configure how the updater determines updates using the other extension methods.
+        /// </summary>
+        public static IUpdaterBuilder HttpZipContentSource(this IUpdaterBuilder builder, string uri, Action<HttpClient, IServiceProvider> configureClient)
+        {
+            if (uri == null) throw new ArgumentNullException(nameof(uri));
+
+            configureClient = configureClient ?? new Action<HttpClient, IServiceProvider>((sp, client) => { });
+            builder.Services.AddHttpClient<IUpdateSource, HttpZipContentSource>((httpClient, sp) =>
+            {
+                configureClient(httpClient, sp);
+                return new HttpZipContentSource(httpClient, uri);
+            });
+            return builder;
+        }
+
+        /// <summary>
         /// Configures the updater to push its updates to the provided assembly. 
         /// You need to configure how the updater determines updates using the other extension methods.
         /// </summary>
@@ -75,12 +116,6 @@ namespace EndogenousUpdater
         public static IUpdaterBuilder CurrentDirectoryDestination(this IUpdaterBuilder builder)
         {
             builder.Services.AddSingleton<IUpdateDestination, DirectoryUpdateDestination>(sp => new DirectoryUpdateDestination(Environment.CurrentDirectory));
-            return builder;
-        }
-
-        public static IUpdaterBuilder DirectoryDestination(this IUpdaterBuilder builder, string directory)
-        {
-            builder.Services.AddSingleton<IUpdateDestination, DirectoryUpdateDestination>(sp => new DirectoryUpdateDestination(directory));
             return builder;
         }
 
@@ -123,7 +158,7 @@ namespace EndogenousUpdater
 
             options.ProcessToRelaunchArguments = new ProcessStartInfo(exe, args);
 
-            if(directory != null)
+            if (directory != null)
                 options.ProcessToRelaunchArguments.WorkingDirectory = directory;
 
             return options;
